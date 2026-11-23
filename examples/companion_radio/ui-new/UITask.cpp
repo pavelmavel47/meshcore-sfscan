@@ -367,11 +367,37 @@ public:
 
       // tx power,  noise floor
       display.setCursor(0, 42);
+#ifdef SFSCAN_ENABLED
+      // SF scanner: last SF received on + packet counts per SF
+      if (radio_driver.getPacketsRecv() > 0) {
+        sprintf(tmp, "TX: %ddBm  Last: SF%d", _node_prefs->tx_power_dbm, radio_driver.getLastRxSF());
+      } else {
+        sprintf(tmp, "TX: %ddBm  %s", _node_prefs->tx_power_dbm, SFSCAN_LABEL);
+      }
+      display.print(tmp);
+      display.setCursor(0, 53);
+      {
+        int n = 0;
+        tmp[0] = 0;
+        for (uint8_t sf = SFSCAN_MIN_SF; sf <= SFSCAN_MAX_SF && n < 21; sf++) {
+          uint32_t c = radio_driver.getRxCountForSF(sf);
+          if (c == 0) continue;
+          char part[16];
+          snprintf(part, sizeof(part), "%s%d:%lu", n ? " " : "", sf, (unsigned long)c);
+          if (n + (int)strlen(part) > 21) break;
+          strcpy(&tmp[n], part);
+          n += strlen(part);
+        }
+        if (n == 0) strcpy(tmp, "RX: noch nichts");
+      }
+      display.print(tmp);
+#else
       sprintf(tmp, "TX: %ddBm", _node_prefs->tx_power_dbm);
       display.print(tmp);
       display.setCursor(0, 53);
       sprintf(tmp, "Noise floor: %d", radio_driver.getNoiseFloor());
       display.print(tmp);
+#endif
     } else if (_page == HomePage::BLUETOOTH) {
       display.setColor(UIColor::corp_blue);
       display.drawXbm((display.width() - 32) / 2, 18,
