@@ -36,6 +36,12 @@ public:
   */
   virtual uint32_t getEstAirtimeFor(int len_bytes) = 0;
 
+  /**
+   * \returns  estimated air-time for actually sending these raw bytes (radios that may send a packet
+   *           more than once, e.g. on several spreading factors, override this).
+  */
+  virtual uint32_t getEstTxAirtimeFor(const uint8_t* raw, int len) { return getEstAirtimeFor(len); }
+
   virtual float packetScore(float snr, int packet_len) = 0;
 
   /**

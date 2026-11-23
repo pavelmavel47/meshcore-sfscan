@@ -324,7 +324,7 @@ void Dispatcher::checkSend() {
     } else {
       memcpy(&raw[len], outbound->payload, outbound->payload_len); len += outbound->payload_len;
 
-      uint32_t max_airtime = _radio->getEstAirtimeFor(len)*3/2;
+      uint32_t max_airtime = _radio->getEstTxAirtimeFor(raw, len)*3/2;
       outbound_start = _ms->getMillis();
       bool success = _radio->startSendRaw(raw, len);
       if (!success) {

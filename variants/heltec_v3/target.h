@@ -5,6 +5,11 @@
 #include <helpers/radiolib/RadioLibWrappers.h>
 #include <HeltecV3Board.h>
 #include <helpers/radiolib/CustomSX1262Wrapper.h>
+#ifdef SFSCAN_ENABLED
+  #include <helpers/radiolib/SFScanSX1262Wrapper.h>
+  #undef WRAPPER_CLASS
+  #define WRAPPER_CLASS SFScanSX1262Wrapper
+#endif
 #include <helpers/AutoDiscoverRTCClock.h>
 #include <helpers/SensorManager.h>
 #include <helpers/sensors/EnvironmentSensorManager.h>
