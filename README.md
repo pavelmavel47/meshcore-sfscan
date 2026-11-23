@@ -1,3 +1,38 @@
+> ## Fork: SF7+8-Scanner für Heltec V3
+>
+> Dies ist ein inoffizieller Fork von [ripplebiz/MeshCore](https://github.com/ripplebiz/MeshCore) (MIT-Lizenz, siehe `license.txt`).
+> Er ergänzt einen Funktreiber, der **mehrere Spreading Factors gleichzeitig abhört** (Standard: SF7 und SF8).
+>
+> - **Empfang:** Der SX1262 kann nur einen SF auf einmal demodulieren. Der Treiber prüft deshalb reihum per Hardware-CAD
+>   (Channel Activity Detection) die SFs aus `SFSCAN_PATTERN` und empfängt auf dem SF, auf dem eine Präambel erkannt wurde.
+> - **Senden (Companion):** auf dem eigenen SF und zusätzlich auf jedem SF, auf dem in den letzten 30 Minuten etwas empfangen wurde.
+> - **Senden (Repeater, `SFSCAN_TX_SAME_SF`):** jedes Paket wird auf dem SF weitergeleitet, auf dem es ankam. Eigene Pakete gehen auf allen SFs raus.
+> - Frequenz, Bandbreite und Coding Rate bleiben fest.
+>
+> **Neue bzw. geänderte Dateien gegenüber Upstream:**
+>
+> | Datei | Änderung |
+> |---|---|
+> | `src/helpers/radiolib/SFScanSX1262Wrapper.{h,cpp}` | neuer Multi-SF-Scan-Treiber |
+> | `src/Dispatcher.{h,cpp}` | neue Methode `getEstTxAirtimeFor()`: Sende-Timeout berücksichtigt Mehrfachsendung auf mehreren SFs |
+> | `variants/heltec_v3/platformio.ini` | Build-Varianten `Heltec_v3_repeater_sfscan` und `Heltec_v3_companion_radio_ble_sfscan` |
+> | `variants/heltec_v3/target.h` | nutzt bei `SFSCAN_ENABLED` den Scan-Treiber |
+> | `examples/simple_repeater/MyMesh.cpp` | `POWERSAVING_DEFAULT`: Low-Energy-Modus bei Neuinstallation an |
+> | `examples/companion_radio/ui-new/UITask.cpp` | Display zeigt den zuletzt empfangenen SF und Paketzähler pro SF |
+> | `platformio.ini` | RadioLib als Archiv-URL statt Git-URL (gleicher Commit) |
+>
+> **Bauen:**
+> ```
+> pio run -e Heltec_v3_repeater_sfscan
+> pio run -e Heltec_v3_companion_radio_ble_sfscan
+> ```
+> Weitere SFs: `SFSCAN_PATTERN` in `variants/heltec_v3/platformio.ini` anpassen (z. B. `8,7,9,8,7,10,...`).
+> Bei Neuinstallation ist das Admin-Passwort des Repeaters `password` und die BLE-PIN `123456`. Beides sofort ändern.
+>
+> Die Änderungen sind experimentell und nicht vom MeshCore-Projekt geprüft. Die ursprüngliche README folgt unten.
+
+---
+
 ## About MeshCore
 
 MeshCore is a lightweight, portable C++ library that enables multi-hop packet routing for embedded projects using LoRa and other packet radios. It is designed for developers who want to create resilient, decentralized communication networks that work without the internet.
